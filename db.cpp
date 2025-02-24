@@ -16,25 +16,28 @@ bool db::openDB(QString file_path){
         std::cout << "Connection FAILED.", database.lastError().text();
         return false;
     }
-    QSqlQuery cursor(database);
-    cursor.exec("SELECT * FROM sqlite_master WHERE type='table");
-    QSqlRecord rec = cursor.record();
+//    QSqlQuery cursor(database);
+//    cursor.exec("SELECT * FROM sqlite_master WHERE type='table'");
+//    QSqlRecord rec = cursor.record();
+
+//    qDebug() << database.tables();
+
+    table_names = database.tables();
     emit set_table_variant_signal(table_names);
 
     return true;
 }
 
-void db::open_table(QString table_name){
+void db::open_table(QVariant table_name){
     model = new QSqlTableModel(this, database);
-    model->setTable(table_name);
+    model->setTable(table_name.toString());
     model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     model->select();
 
-//    qDebug() << model->record(0);
+//    qDebug() << model->record();
     emit set_table_signal(model);
 }
 
 void db::close_database(){
     model->submitAll();
-    database.close();
 }

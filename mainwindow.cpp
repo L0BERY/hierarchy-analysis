@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent)
     anim_group->addAnimation(anim_size_table);
 
     connect(database, &db::set_table_signal, this, &MainWindow::set_table_slot);
+    connect(database, &db::set_table_variant_signal, this, &MainWindow::set_table_variant_slot);
 }
 
 MainWindow::~MainWindow()
@@ -56,7 +57,7 @@ void MainWindow::on_but_file_path_clicked()
         anim->setDuration(msec);
         anim->start();
     };
-
+    ui->choice_table->clear();
     set_anim(anim_text, 1.0, 0);
 
     QString path = ui->text_file_path->toPlainText();
@@ -80,12 +81,15 @@ void MainWindow::on_but_file_path_clicked()
         set_anim(anim_text, 0.0, 1000);
     }
     else {
-        if(!is_open) ui->but_start->setEnabled(true);
+        if(!is_open) {
+            ui->but_start->setEnabled(true);
+            ui->choice_table->setEnabled(true);
+        }
         ui->but_show_db->setEnabled(true);
-        ui->choice_table->setEnabled(true);
         ui->text_state->setStyleSheet("color : green");
         ui->text_state->setText("Файл найден");
         file_path = path;
+        if(!database->openDB(file_path)) exit(1);
         set_anim(anim_text, 0.0, 1000);
 
     }
@@ -96,23 +100,22 @@ void MainWindow::on_but_show_db_clicked()
     is_open = !is_open;
     if (is_open){
         ui->but_start->setEnabled(false);
+        ui->choice_table->setEnabled(false);
         anim_drag_table->setStartValue(QPoint(start_but_pos.x() + ui->but_show_db->width(), start_but_pos.y()));
         anim_drag_table->setEndValue(pos_tableView);
-
 //        opacity_table->setOpacity(0.0);
-
         anim_opacity_table->setStartValue(0.0);
         anim_opacity_table->setEndValue(1.0);
-
         anim_size_table->setStartValue(QSize(1, 1));
         anim_size_table->setEndValue(size_table);
         ui->tableView->show();
         anim_group->start();
         ui->but_show_db->setText("Закрыть таблицу");
-        if(!database->openDB(file_path)) exit(1);
+        database->open_table(ui->choice_table->currentText());
     }
     else{
         ui->but_start->setEnabled(true);
+        ui->choice_table->setEnabled(true);
         anim_drag_table->setStartValue(pos_tableView);
         anim_drag_table->setEndValue(QPoint(start_but_pos.x() + ui->but_show_db->width(), start_but_pos.y()));
         anim_opacity_table->setStartValue(1.0);

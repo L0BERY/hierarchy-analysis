@@ -20,7 +20,7 @@ public:
     ~db();
     void close_database();
     bool openDB(QString);
-    void open_table(QString);
+    void open_table(QVariant);
 
 signals:
     void set_table_signal(QSqlTableModel *model);
