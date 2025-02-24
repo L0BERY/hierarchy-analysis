@@ -3,11 +3,11 @@
 
 #include <QObject>
 
-class calculate
+class calculate : public QObject
 {
     Q_OBJECT
 public:
-    calculate();
+    calculate(QObject *parent);
 };
 
 #endif // CALCULATE_H

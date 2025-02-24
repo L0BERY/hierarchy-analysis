@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tableView->hide();
+    ui->choice_table->setEnabled(false);
 
     anim_text = new QPropertyAnimation(ui->text_state);
     grEffect = new QGraphicsOpacityEffect(ui->text_state);
@@ -18,9 +19,13 @@ MainWindow::MainWindow(QWidget *parent)
     anim_drag_table->setDuration(400);
     anim_drag_table->setEasingCurve(QEasingCurve::OutQuart);
 
-    anim_opacity_table = new QPropertyAnimation(ui->tableView, "opacity");
-    anim_opacity_table->setDuration(400);
+    anim_opacity_table = new QPropertyAnimation(ui->tableView);
     anim_opacity_table->setEasingCurve(QEasingCurve::OutQuart);
+    opacity_table = new QGraphicsOpacityEffect(ui->tableView);
+    ui->tableView->setGraphicsEffect(opacity_table);
+    anim_opacity_table->setTargetObject(opacity_table);
+    anim_opacity_table->setPropertyName("opacity");
+    anim_opacity_table->setDuration(40);
 
     anim_size_table = new QPropertyAnimation(ui->tableView, "size");
     anim_size_table->setDuration(400);
@@ -60,6 +65,7 @@ void MainWindow::on_but_file_path_clicked()
         if(is_open) on_but_show_db_clicked();
         ui->but_start->setEnabled(false);
         ui->but_show_db->setEnabled(false);
+        ui->choice_table->setEnabled(false);
         ui->text_state->setStyleSheet("color : red");
         ui->text_state->setText("Файл не существует");
         set_anim(anim_text, 0.0, 1000);
@@ -68,6 +74,7 @@ void MainWindow::on_but_file_path_clicked()
         if(is_open) on_but_show_db_clicked();
         ui->but_start->setEnabled(false);
         ui->but_show_db->setEnabled(false);
+        ui->choice_table->setEnabled(false);
         ui->text_state->setStyleSheet("color : red");
         ui->text_state->setText("Неверный формат файла");
         set_anim(anim_text, 0.0, 1000);
@@ -75,6 +82,7 @@ void MainWindow::on_but_file_path_clicked()
     else {
         if(!is_open) ui->but_start->setEnabled(true);
         ui->but_show_db->setEnabled(true);
+        ui->choice_table->setEnabled(true);
         ui->text_state->setStyleSheet("color : green");
         ui->text_state->setText("Файл найден");
         file_path = path;
@@ -91,12 +99,7 @@ void MainWindow::on_but_show_db_clicked()
         anim_drag_table->setStartValue(QPoint(start_but_pos.x() + ui->but_show_db->width(), start_but_pos.y()));
         anim_drag_table->setEndValue(pos_tableView);
 
-        opacity_table = new QGraphicsOpacityEffect(this);
 //        opacity_table->setOpacity(0.0);
-        ui->tableView->setGraphicsEffect(opacity_table);
-
-        anim_opacity_table->setTargetObject(opacity_table);
-        anim_opacity_table->setPropertyName("opacity");
 
         anim_opacity_table->setStartValue(0.0);
         anim_opacity_table->setEndValue(1.0);
@@ -105,7 +108,7 @@ void MainWindow::on_but_show_db_clicked()
         anim_size_table->setEndValue(size_table);
         ui->tableView->show();
         anim_group->start();
-        ui->but_show_db->setText("Закрыть базу данных");
+        ui->but_show_db->setText("Закрыть таблицу");
         if(!database->openDB(file_path)) exit(1);
     }
     else{
@@ -117,7 +120,7 @@ void MainWindow::on_but_show_db_clicked()
         anim_size_table->setStartValue(size_table);
         anim_size_table->setEndValue(QSize(1, 1));
         anim_group->start();
-        ui->but_show_db->setText("Открыть базу данных");
+        ui->but_show_db->setText("Открыть таблицу");
         database->close_database();
     }
 }
@@ -125,6 +128,12 @@ void MainWindow::on_but_show_db_clicked()
 void MainWindow::on_but_start_clicked()
 {
 
+}
+
+void MainWindow::set_table_variant_slot(QStringList table_names){
+    for(int i = 0; i < table_names.length(); i++){
+        ui->choice_table->addItem(table_names[i]);
+    }
 }
 
 void MainWindow::set_table_slot(QSqlTableModel *model){

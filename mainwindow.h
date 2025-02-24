@@ -35,6 +35,7 @@ private slots:
 
 public slots:
     void set_table_slot(QSqlTableModel *model);
+    void set_table_variant_slot(QStringList table_names);
 
 
 private:

@@ -1,6 +1,6 @@
 #include "calculate.h"
 
-calculate::calculate()
+calculate::calculate(QObject *parent) : QObject(parent)
 {
 
 }
