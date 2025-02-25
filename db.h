@@ -19,15 +19,17 @@ public:
     db();
     ~db();
     void close_database();
+    void save_model();
     bool openDB(QString);
     void open_table(QVariant);
+    void get_matrix_db(QVariant);
 
 signals:
     void set_table_signal(QSqlTableModel *model);
     void set_table_variant_signal(QStringList table_names);
 
 private:
-    QSqlTableModel *model;
+    QSqlTableModel *model = nullptr;
     QSqlDatabase database;
     QStringList table_names;
 };

@@ -110,7 +110,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>440</y>
+      <y>450</y>
       <width>201</width>
       <height>41</height>
      </rect>
@@ -139,7 +139,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>490</y>
+      <y>500</y>
       <width>201</width>
       <height>41</height>
      </rect>
@@ -196,6 +196,13 @@ p, li { white-space: pre-wrap; }
       <height>521</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
    </widget>
    <widget class="QPushButton" name="but_show_db">
     <property name="enabled">
@@ -204,7 +211,7 @@ p, li { white-space: pre-wrap; }
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>390</y>
+      <y>400</y>
       <width>201</width>
       <height>41</height>
      </rect>
@@ -226,8 +233,15 @@ p, li { white-space: pre-wrap; }
       <x>20</x>
       <y>360</y>
       <width>201</width>
-      <height>21</height>
+      <height>31</height>
      </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
     </property>
    </widget>
   </widget>

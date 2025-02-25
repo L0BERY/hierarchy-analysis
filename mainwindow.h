@@ -11,6 +11,7 @@
 #include <QParallelAnimationGroup>
 
 #include "db.h"
+#include "calculate.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -32,6 +33,8 @@ private slots:
     void on_but_start_clicked();
 
     void on_but_show_db_clicked();
+
+    void on_but_add_clicked();
 
 public slots:
     void set_table_slot(QSqlTableModel *model);
