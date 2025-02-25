@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tableView->hide();
+    ui->widget->hide();
     ui->choice_table->setEnabled(false);
 
     anim_text = new QPropertyAnimation(ui->text_state);
@@ -19,25 +20,32 @@ MainWindow::MainWindow(QWidget *parent)
     anim_drag_table->setDuration(400);
     anim_drag_table->setEasingCurve(QEasingCurve::OutQuart);
 
-//    anim_opacity_table = new QPropertyAnimation(ui->tableView);
-//    anim_opacity_table->setTargetObject(ui->tableView);
-//    anim_opacity_table->setPropertyName("windowOpacity");
-//    anim_opacity_table->setEasingCurve(QEasingCurve::OutQuart);
-//    opacity_table = new QGraphicsOpacityEffect(ui->tableView);
-//    ui->tableView->setGraphicsEffect(opacity_table);
-//    anim_opacity_table->setDuration(400);
+    anim_drag_widget = new QPropertyAnimation(ui->widget, "pos");
+    anim_drag_widget->setDuration(400);
+    anim_drag_widget->setEasingCurve(QEasingCurve::OutQuart);
 
     anim_size_table = new QPropertyAnimation(ui->tableView, "size");
     anim_size_table->setDuration(400);
     anim_size_table->setEasingCurve(QEasingCurve::OutQuart);
 
+    anim_size_widget = new QPropertyAnimation(ui->widget, "size");
+    anim_size_widget->setDuration(400);
+    anim_size_widget->setEasingCurve(QEasingCurve::OutQuart);
+
+    pos_widget = ui->widget->pos();
+    start_point_widget = ui->but_file_path->pos();
+    size_widget = ui->widget->size();
+
     start_but_pos = ui->but_show_db->pos();
     pos_tableView = ui->tableView->pos();
     size_table = ui->tableView->size();
 
+    anim_group_widget = new QParallelAnimationGroup(this);
+    anim_group_widget->addAnimation(anim_drag_widget);
+    anim_group_widget->addAnimation(anim_size_widget);
+
     anim_group = new QParallelAnimationGroup(this);
     anim_group->addAnimation(anim_drag_table);
-//    anim_group->addAnimation(anim_opacity_table);
     anim_group->addAnimation(anim_size_table);
 
     connect(database, &db::set_table_signal, this, &MainWindow::set_table_slot);
@@ -69,32 +77,53 @@ void MainWindow::on_but_file_path_clicked()
         ui->text_state->setText(text);
     };
 
+    auto anim_widget = [this](){
+        anim_drag_widget->setStartValue(pos_widget);
+        anim_drag_widget->setEndValue(QPoint(0, 50));
+        anim_size_widget->setStartValue(size_table);
+        anim_size_widget->setEndValue(QSize(1, 1));
+        anim_group_widget->start();
+    };
+
     ui->choice_table->clear();
     set_anim(anim_text, 1.0, 0);
 
     QString path = ui->text_file_path->toPlainText();
     QFileInfo file(path);
     if(!(file.exists() && file.isFile())){
+
         ui_helper("Файл не существует");
         set_anim(anim_text, 0.0, 1000);
+        if(file_path != "") anim_widget();
+        file_path = "";
     }
     else if(file.suffix() != "db"){
+
         ui_helper("Неверный формат файла");
         set_anim(anim_text, 0.0, 1000);
+        if(file_path != "") anim_widget();
+        file_path = "";
     }
     else {
         if(!is_open) {
             ui->but_start->setEnabled(true);
             ui->choice_table->setEnabled(true);
-            if(!database->openDB(file_path)) exit(1);
         }
         ui->but_show_db->setEnabled(true);
         ui->text_state->setStyleSheet("color : green");
         ui->text_state->setText("Файл найден");
-        file_path = path;
-
         set_anim(anim_text, 0.0, 1000);
+        ui->widget->show();
+        if(file_path == ""){
 
+            anim_drag_widget->setStartValue(QPoint(0, 50));
+            anim_drag_widget->setEndValue(pos_widget);
+            anim_size_widget->setStartValue(QSize(1, 1));
+            anim_size_widget->setEndValue(size_widget);
+            anim_group_widget->start();
+        }
+        file_path = path;
+        if(!database->openDB(file_path)) exit(1);
     }
 }
 
@@ -104,25 +133,23 @@ void MainWindow::on_but_show_db_clicked()
     if (is_open){
         ui->but_start->setEnabled(false);
         ui->choice_table->setEnabled(false);
-        anim_drag_table->setStartValue(QPoint(start_but_pos.x() + ui->but_show_db->width(), start_but_pos.y()));
+        anim_drag_table->setStartValue(QPoint(start_but_pos.x() + ui->but_show_db->width() + 20, start_but_pos.y() + 90));
         anim_drag_table->setEndValue(pos_tableView);
-//        opacity_table->setOpacity(0.0);
-//        anim_opacity_table->setStartValue(0.0);
-//        anim_opacity_table->setEndValue(1.0);
+
         anim_size_table->setStartValue(QSize(1, 1));
         anim_size_table->setEndValue(size_table);
         ui->tableView->show();
         anim_group->start();
         ui->but_show_db->setText("Закрыть таблицу");
-        database->open_table(ui->choice_table->currentText());
+        database->reset_table(ui->choice_table->currentText());
+        database->open_table();
     }
     else{
         ui->but_start->setEnabled(true);
         ui->choice_table->setEnabled(true);
         anim_drag_table->setStartValue(pos_tableView);
-        anim_drag_table->setEndValue(QPoint(start_but_pos.x() + ui->but_show_db->width(), start_but_pos.y()));
-//        anim_opacity_table->setStartValue(1.0);
-//        anim_opacity_table->setEndValue(0.0);
+        anim_drag_table->setEndValue(QPoint(start_but_pos.x() + ui->but_show_db->width() + 20, start_but_pos.y() + 90));
+
         anim_size_table->setStartValue(size_table);
         anim_size_table->setEndValue(QSize(1, 1));
         anim_group->start();
@@ -147,8 +174,9 @@ void MainWindow::set_table_slot(QSqlTableModel *model){
     ui->tableView->hideColumn(0);
 }
 
-void MainWindow::on_but_add_clicked()
-{
 
+void MainWindow::on_choice_table_currentTextChanged(const QString &arg1)
+{
+    database->reset_table(ui->choice_table->currentText());
 }
 

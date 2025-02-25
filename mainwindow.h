@@ -34,7 +34,7 @@ private slots:
 
     void on_but_show_db_clicked();
 
-    void on_but_add_clicked();
+    void on_choice_table_currentTextChanged(const QString &arg1);
 
 public slots:
     void set_table_slot(QSqlTableModel *model);
@@ -45,16 +45,16 @@ private:
     Ui::MainWindow *ui;
     db *database = new db;
     bool is_open = false;
-    QPoint start_but_pos;
-    QPoint pos_tableView;
+    QPoint start_but_pos, start_point_widget;
+    QPoint pos_tableView, pos_widget;
     QPropertyAnimation *anim_text;
-    QPropertyAnimation *anim_drag_table;
-    QPropertyAnimation *anim_opacity_table;
-    QPropertyAnimation *anim_size_table;
-    QSize size_table;
-    QParallelAnimationGroup *anim_group;
+    QPropertyAnimation *anim_drag_table, *anim_opacity_table, *anim_size_table;
+    QPropertyAnimation *anim_drag_widget, *anim_size_widget;
+
+    QSize size_table, size_widget;
+    QParallelAnimationGroup *anim_group, *anim_group_widget;
     QGraphicsOpacityEffect *grEffect;
-    QGraphicsOpacityEffect *opacity_table;
+//    QGraphicsOpacityEffect *opacity_table;
     QString file_path = "";
 };
 #endif // MAINWINDOW_H

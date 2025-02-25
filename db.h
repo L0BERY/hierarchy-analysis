@@ -21,7 +21,8 @@ public:
     void close_database();
     void save_model();
     bool openDB(QString);
-    void open_table(QVariant);
+    void open_table();
+    void reset_table(QVariant table_name);
     void get_matrix_db(QVariant);
 
 signals:
