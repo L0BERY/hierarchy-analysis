@@ -29,29 +29,28 @@ public:
 
 private slots:
     void on_but_file_path_clicked();
-
     void on_but_start_clicked();
-
     void on_but_show_db_clicked();
-
     void on_choice_table_currentTextChanged(const QString &arg1);
+
 
 public slots:
     void set_table_slot(QSqlTableModel *model);
     void set_table_variant_slot(QStringList table_names);
-
+    void set_otvet_slot(int, float);
 
 private:
     Ui::MainWindow *ui;
     db *database = new db;
+    calculate *calc = new calculate;
     bool is_open = false;
     QPoint start_but_pos, start_point_widget;
-    QPoint pos_tableView, pos_widget;
+    QPoint pos_tableView = QPoint(250, 90), pos_widget;
     QPropertyAnimation *anim_text;
     QPropertyAnimation *anim_drag_table, *anim_opacity_table, *anim_size_table;
     QPropertyAnimation *anim_drag_widget, *anim_size_widget;
 
-    QSize size_table, size_widget;
+    QSize size_table = QSize(681, 521), size_widget;
     QParallelAnimationGroup *anim_group, *anim_group_widget;
     QGraphicsOpacityEffect *grEffect;
 //    QGraphicsOpacityEffect *opacity_table;

@@ -2,7 +2,6 @@
 #define DB_H
 #pragma once
 
-#include <iostream>
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlError>
@@ -23,7 +22,10 @@ public:
     bool openDB(QString);
     void open_table();
     void reset_table(QVariant table_name);
-    void get_matrix_db(QVariant);
+    std::tuple<QVector<QVector<QVector<float>>>, int, int> get_matrix_db();
+    QString get_name_var(int);
+
+    int count_tables = 0;
 
 signals:
     void set_table_signal(QSqlTableModel *model);
@@ -33,6 +35,7 @@ private:
     QSqlTableModel *model = nullptr;
     QSqlDatabase database;
     QStringList table_names;
+    int column = 1, row = 1;
 };
 
 #endif // DB_H
