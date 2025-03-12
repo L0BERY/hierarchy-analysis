@@ -24,6 +24,8 @@ public:
     void reset_table(QVariant table_name);
     std::tuple<QVector<QVector<QVector<float>>>, int, int> get_matrix_db();
     QString get_name_var(int);
+    QStringList get_name_vars();
+    int get_row();
 
     int count_tables = 0;
 

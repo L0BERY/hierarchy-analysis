@@ -17,7 +17,7 @@ public:
     void calc();
 
 signals:
-    void set_otvet_signal(int, float);
+    void set_otvet_signal(int, float, QVector<float>*);
 
 private:
     int n = 0;  //строки (варианты)

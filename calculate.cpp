@@ -79,5 +79,5 @@ void calculate::calc(){
         }
     }
 
-    emit set_otvet_signal(index, max);
+    emit set_otvet_signal(index, max, &this->otvet);
 }

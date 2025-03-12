@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->choice_table->setEnabled(false);
     ui->tableView->hide();
     ui->widget->hide();
+    ui->tableWidget->hide();
 
     this->setWindowFlags(Qt::MSWindowsFixedSizeDialogHint);
 
@@ -26,6 +27,10 @@ MainWindow::MainWindow(QWidget *parent)
     anim_drag_widget->setDuration(400);
     anim_drag_widget->setEasingCurve(QEasingCurve::OutQuart);
 
+    anim_drag_table_otvet = new QPropertyAnimation(ui->widget_2, "pos");
+    anim_drag_table_otvet->setDuration(400);
+    anim_drag_table_otvet->setEasingCurve(QEasingCurve::OutQuart);
+
     anim_size_table = new QPropertyAnimation(ui->tableView, "size");
     anim_size_table->setDuration(400);
     anim_size_table->setEasingCurve(QEasingCurve::OutQuart);
@@ -34,9 +39,14 @@ MainWindow::MainWindow(QWidget *parent)
     anim_size_widget->setDuration(400);
     anim_size_widget->setEasingCurve(QEasingCurve::OutQuart);
 
+    anim_size_table_otvet = new QPropertyAnimation(ui->widget_2, "size");
+    anim_size_table_otvet->setDuration(400);
+    anim_size_table_otvet->setEasingCurve(QEasingCurve::OutQuart);
+
     pos_widget = ui->widget->pos();
     start_point_widget = ui->but_file_path->pos();
     size_widget = ui->widget->size();
+    start_table_otvet = ui->but_start->pos();
 
     start_but_pos = ui->but_show_db->pos();
 
@@ -47,6 +57,10 @@ MainWindow::MainWindow(QWidget *parent)
     anim_group = new QParallelAnimationGroup(this);
     anim_group->addAnimation(anim_drag_table);
     anim_group->addAnimation(anim_size_table);
+
+    anim_group_table_otvet = new QParallelAnimationGroup(this);
+    anim_group_table_otvet->addAnimation(anim_drag_table_otvet);
+    anim_group_table_otvet->addAnimation(anim_size_table_otvet);
 
     connect(database, &db::set_table_signal, this, &MainWindow::set_table_slot);
     connect(database, &db::set_table_variant_signal, this, &MainWindow::set_table_variant_slot);
@@ -60,6 +74,7 @@ MainWindow::~MainWindow(){
 void MainWindow::on_but_file_path_clicked(){
     database->close_database();
     ui->label->setText("");
+    if(otvet_show)close_table_otvet();
     auto set_anim = [](QPropertyAnimation* anim, float a, int msec){
         anim->setStartValue(1.0);
         anim->setEndValue(a);
@@ -123,6 +138,7 @@ void MainWindow::on_but_file_path_clicked(){
         }
         file_path = path;
         if(!database->openDB(file_path)) exit(1);
+        database->reset_table("Варианты");
     }
 }
 
@@ -130,9 +146,10 @@ void MainWindow::on_but_show_db_clicked(){
     ui->label->setText("");
     is_open = !is_open;
     if (is_open){
+        if(otvet_show)close_table_otvet();
         ui->but_start->setEnabled(false);
         ui->choice_table->setEnabled(false);
-        anim_drag_table->setStartValue(QPoint(start_but_pos.x() + ui->but_show_db->width() + 20, start_but_pos.y() + 90));
+        anim_drag_table->setStartValue(QPoint(start_but_pos.x() + ui->but_show_db->width() + 20, start_but_pos.y()+ 90));
         anim_drag_table->setEndValue(pos_tableView);
         anim_size_table->setStartValue(QSize(1, 1));
         anim_size_table->setEndValue(size_table);
@@ -178,8 +195,40 @@ void MainWindow::set_table_slot(QSqlTableModel *model){
     }
 }
 
-void MainWindow::set_otvet_slot(int i, float a){
-    ui->label->setText("Лучший вариант: "+database->get_name_var(i));
+void MainWindow::close_table_otvet(){
+    this->otvet_show = false;
+    anim_drag_table_otvet->setStartValue(end_val_table_otvet);
+    anim_drag_table_otvet->setEndValue(QPoint(start_table_otvet.x() + ui->but_start->width() + 20, start_table_otvet.y() + 130));
+    anim_size_table_otvet->setStartValue(size_table_otvet);
+    anim_size_table_otvet->setEndValue(QSize(1, 1));
+    anim_group_table_otvet->start();
+}
+
+void MainWindow::set_otvet_slot(int i, float a, QVector<float> *ves){
+    Q_UNUSED(a);
+    if(this->otvet_show) return;
+    this->otvet_show = true;
+
+    ui->tableWidget->show();
+    ui->tableWidget->clear();
+
+    anim_drag_table_otvet->setStartValue(QPoint(start_table_otvet.x() + ui->but_start->width() + 20, start_table_otvet.y() + 130));
+    anim_drag_table_otvet->setEndValue(end_val_table_otvet);
+    anim_size_table_otvet->setStartValue(QSize(1, 1));
+    anim_size_table_otvet->setEndValue(size_table_otvet);
+    anim_group_table_otvet->start();
+
+    ui->label->setText("Лучший вариант: " + database->get_name_var(i));
+    ui->tableWidget->setRowCount(database->get_row());
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << "Варианты" << "Вес, %");
+    QStringList names = database->get_name_vars();
+    for(int i = 0; i < database->get_row(); i++){
+        ui->tableWidget->setItem(i, 0, new QTableWidgetItem(names[i]));
+        ui->tableWidget->setItem(i, 1, new QTableWidgetItem(QString::number(std::round(ves->value(i) * 100.0))));
+//        qDebug() << ves->value(i);
+    }
+
+//    qDebug() << ves;
 }
 
 void MainWindow::on_choice_table_currentTextChanged(const QString &arg1){

@@ -14,6 +14,7 @@ bool db::openDB(QString file_path){
     database.setDatabaseName(file_path);
     if(!database.open()) return false;
     table_names = database.tables();
+//    qDebug() << table_names;
     count_tables = database.tables().count();
     emit set_table_variant_signal(table_names);
     return true;
@@ -42,6 +43,23 @@ QString db::get_name_var(int i){
     return cursor.value(1).toString();
 }
 
+QStringList db::get_name_vars(){
+    QSqlQuery cursor(database);
+    cursor.exec("SELECT * FROM Варианты");
+    QStringList var;
+    cursor.first();
+    var.append(cursor.value(1).toString());
+    for(int j = 0; j < this->row - 1; j++) {
+        cursor.next();
+        var.append(cursor.value(1).toString());
+    }
+    return var;
+}
+
+int db::get_row(){
+    return this->row;
+}
+
 std::tuple<QVector<QVector<QVector<float>>>, int, int> db::get_matrix_db(){
     QVector<QVector<QVector<float>>> final_matrix;
     QVector<QVector<float>> matrix;
@@ -52,21 +70,24 @@ std::tuple<QVector<QVector<QVector<float>>>, int, int> db::get_matrix_db(){
     for(int j = 0; j < count_tables; j++){
         matrix.clear();
         help_matrix.clear();
-        if(table_names[j] == "Варианты") {
+        QString req = "SELECT * FROM ";
+
+        if(j == 0) {
             n = 2;
             a = column;
+            req += "Варианты";
         }
-        else if(table_names[j] == "Критерии") {
+        else if(j == 1) {
             n = 1;
             a = column - 1;
+            req += "Критерии";
         }
         else{
             n = 1;
             a = row + 1;
+            req += table_names[j];
         }
 //        qDebug() << row;
-        QString req = "SELECT * FROM ";
-        req += table_names[j];
         cursor.exec(req);
         cursor.first();
 //        qDebug() << cursor.record();
