@@ -52,7 +52,7 @@ private:
     QPropertyAnimation *anim_drag_widget, *anim_size_widget;
     QPropertyAnimation *anim_drag_table_otvet, *anim_size_table_otvet;
 
-    QSize size_table = QSize(681, 521), size_widget, size_table_otvet = QSize(211, 261);
+    QSize size_table = QSize(681, 521), size_widget, size_table_otvet = QSize(231, 261);
     QParallelAnimationGroup *anim_group, *anim_group_widget, *anim_group_table_otvet;
     QGraphicsOpacityEffect *grEffect;
 //    QGraphicsOpacityEffect *opacity_table;

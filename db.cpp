@@ -28,6 +28,8 @@ void db::reset_table(QVariant table_name){
     if(table_name.toString() == "Варианты"){
         this->column = model->columnCount();
         this->row = model->rowCount();
+//        qDebug() << this->column;
+//        qDebug() << this->row;
     }
 }
 

@@ -27,10 +27,12 @@ void calculate::set_matrix(std::tuple<QVector<QVector<QVector<float>>>, int, int
 //    qDebug() << this->matrix_db;
     n = std::get<1>(tuple);
     m = std::get<2>(tuple);
+//    qDebug() <<n;
+//    qDebug() <<m;
 }
 void calculate::calc(){
     int a = 1;
-    //qDebug() << this->matrix_db;
+//    qDebug() << this->matrix_db;
     this->help_matrix.clear();
     this->otvet.clear();
     for(int iter = 1; iter < m+2; iter++){
@@ -38,6 +40,8 @@ void calculate::calc(){
         this->middle_val.clear();
         if(iter == 1) a = m;
         else a = n;
+
+//        qDebug() << "1";
 
         for(int i = 0; i < a; i++){
             float val = 0;
@@ -52,6 +56,7 @@ void calculate::calc(){
                 this->matrix_db[iter][j][i] = this->matrix_db[iter][j][i] / sum_of_column[i];
             }
         }
+//        qDebug() << "2";
 //        qDebug() << this->matrix_db[iter];
         for(int i = 0; i < a; i++){
             this->middle_val.append(sum_vector(this->matrix_db[iter][i]) / float(a));
@@ -61,14 +66,15 @@ void calculate::calc(){
     }
 //    qDebug() << this->help_matrix;
 
-    for(int i = 1; i < n+1; i++){
+    for(int i = 0; i < n; i++){
         float val = 0;
         for(int j = 0; j < m; j++){
-            val += this->help_matrix[i][j] * this->help_matrix[0][j];
+            val += this->help_matrix[j+1][i] * this->help_matrix[0][j];
+//            qDebug() << val;
         }
         this->otvet.append(val);
     }
- //   qDebug() << this->otvet;
+//    qDebug() << this->otvet;
 
     float max = this->otvet[0];
     float index = 0;
@@ -78,6 +84,5 @@ void calculate::calc(){
             index = i;
         }
     }
-
     emit set_otvet_signal(index, max, &this->otvet);
 }
