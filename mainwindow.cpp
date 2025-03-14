@@ -186,12 +186,17 @@ void MainWindow::set_table_variant_slot(QStringList table_names){
 void MainWindow::set_table_slot(QSqlTableModel *model){
     ui->tableView->setModel(model);
     if(ui->choice_table->currentText() == "Варианты"){
+        for(int i = 0; i < model->columnCount(); i++){
+            ui->tableView->showColumn(i);
+        }
         ui->tableView->hideColumn(0);
-        ui->tableView->showColumn(model->columnCount() - 1);
     }
     else {
+        for(int i = 0; i < model->columnCount(); i++){
+            ui->tableView->showColumn(i);
+        }
         ui->tableView->hideColumn(model->columnCount() - 1);
-        ui->tableView->showColumn(0);
+
     }
 }
 
